@@ -14,13 +14,38 @@ namespace IMS.Plugins.EFCore
 
         public async Task<IEnumerable<Inventory>> GetInventoriesByName(string name)
         {
-            return await this.db.Inventories.Where(x=> x.InventoryName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+            return await this.db.Inventories.Where(x => x.InventoryName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
                 string.IsNullOrWhiteSpace(name)).ToListAsync();
         }
         public async Task AddInventoryAsync(Inventory inventory)
         {
+            if (db.Inventories.Any(x => x.InventoryName.Equals(inventory.InventoryName, StringComparison.OrdinalIgnoreCase)))
+                return;
+            
             this.db.Inventories.Add(inventory);
             await this.db.SaveChangesAsync();
+        }
+
+        public async Task UpdateInventoryAsync(Inventory inventory)
+        {
+            if (db.Inventories.Any(x => x.InventoryId != inventory.InventoryId &&
+                x.InventoryName.Equals(inventory.InventoryName, StringComparison.OrdinalIgnoreCase)))
+                return;
+
+                var inv = await this.db.Inventories.FindAsync(inventory.InventoryId);
+            if (inventory != null)
+            {
+                inventory.InventoryName = inventory.InventoryName;
+                inventory.Price = inventory.Price;
+                inventory.Quantity = inventory.Quantity;
+
+                await db.SaveChangesAsync();
+            }
+        }
+
+        public async Task<Inventory?> GetInventoryAsync(int inventoryId)
+        {
+            return await this.db.Inventories.FindAsync(inventoryId);
         }
     }
 }
