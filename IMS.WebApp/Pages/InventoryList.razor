@@ -23,12 +23,12 @@
         <tbody>
             @foreach (var inv in this.listInventories)
             {
-                <InventoryItemComponent Inventory = "inv"></InventoryItemComponent>
+                <InventoryItemComponent Inventory="inv"></InventoryItemComponent>
             }
         </tbody>
     </table>
 }
-<br/>
+<br />
 <button type="button" class="btn btn-primary" @onclick="AddInventory">Add Inventory</button>
 
 @code {
@@ -48,5 +48,5 @@
     private void AddInventory()
     {
         NavigationManager.NavigateTo("/addinventory");
-    }    
+    }
 }
