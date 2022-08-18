@@ -12,6 +12,14 @@ namespace IMS.Plugins.EFCore
             this.db = db;
         }
 
+        public async Task AddProductAsync(Product product)
+        {
+            if( db.Products.Any(x=> x.ProductName.Equals(product.ProductName, StringComparison.OrdinalIgnoreCase)))
+
+            db.Products.Add(product);
+            await db.SaveChangesAsync();
+        }
+
         //public async Task<IEnumerable<Inventory>> GetInventoriesByName(string name)
         //{
         //    return await this.db.Inventories.Where(x => x.InventoryName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
@@ -21,7 +29,7 @@ namespace IMS.Plugins.EFCore
         //{
         //    if (db.Inventories.Any(x => x.InventoryName.Equals(inventory.InventoryName, StringComparison.OrdinalIgnoreCase)))
         //        return;
-            
+
         //    this.db.Inventories.Add(inventory);
         //    await this.db.SaveChangesAsync();
         //}
