@@ -19,8 +19,7 @@ namespace IMS.UseCases
 
         public async Task ExecuteAsync(Product product)
         {
-            if (product == null)
-                return;
+            if (product == null) return;
 
             await productInventory.AddProductAsync(product);
         }

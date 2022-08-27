@@ -1,12 +1,18 @@
 ﻿using IMS.CoreBusiness;
 using IMS.UseCases.PluginInterfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace IMS.Plugins.EFCore
 {
     public class ProductRepository : IProductRepository
     {
         private readonly IMSContext db;
+
         public ProductRepository(IMSContext db)
         {
             this.db = db;
@@ -14,46 +20,51 @@ namespace IMS.Plugins.EFCore
 
         public async Task AddProductAsync(Product product)
         {
-            if( db.Products.Any(x=> x.ProductName.Equals(product.ProductName, StringComparison.OrdinalIgnoreCase)))
+            if (db.Products.Any(x => x.ProductName.ToLower() == product.ProductName.ToLower())) return;
 
             db.Products.Add(product);
             await db.SaveChangesAsync();
         }
 
-        //public async Task<IEnumerable<Inventory>> GetInventoriesByName(string name)
-        //{
-        //    return await this.db.Inventories.Where(x => x.InventoryName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
-        //        string.IsNullOrWhiteSpace(name)).ToListAsync();
-        //}
-        //public async Task AddInventoryAsync(Inventory inventory)
-        //{
-        //    if (db.Inventories.Any(x => x.InventoryName.Equals(inventory.InventoryName, StringComparison.OrdinalIgnoreCase)))
-        //        return;
-
-        //    this.db.Inventories.Add(inventory);
-        //    await this.db.SaveChangesAsync();
-        //}
-
-        //public async Task UpdateInventoryAsync(Inventory inventory)
-        //{
-        //    if (db.Inventories.Any(x => x.InventoryId != inventory.InventoryId &&
-        //        x.InventoryName.Equals(inventory.InventoryName, StringComparison.OrdinalIgnoreCase)))
-        //        return;
-
-        //        var inv = await this.db.Inventories.FindAsync(inventory.InventoryId);
-        //    if (inventory != null)
-        //    {
-        //        inventory.InventoryName = inventory.InventoryName;
-        //        inventory.Price = inventory.Price;
-        //        inventory.Quantity = inventory.Quantity;
-
-        //        await db.SaveChangesAsync();
-        //    }
-        //}
-        public async Task<List<Product>> GetProductsByName(string name)
+        public async Task DeleteProductAsync(int productId)
         {
-            return await this.db.Products.Where(x => x.ProductName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
-                string.IsNullOrWhiteSpace(name)).ToListAsync();
+            var product = await db.Products.FindAsync(productId);
+            if (product != null)
+            {
+                product.IsActive = false;
+                await db.SaveChangesAsync();
+            }
+        }
+
+        public async Task<Product> GetProductByIdAsync(int productId)
+        {
+            return await db.Products.Include(x => x.ProductInventories)
+                .ThenInclude(x => x.Inventory)
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
+        }
+
+        public async Task<List<Product>> GetProductsByNameAsync(string name)
+        {
+            return await this.db.Products.Where(x => (x.ProductName.ToLower().IndexOf(name.ToLower()) >= 0 ||
+                                                    string.IsNullOrWhiteSpace(name)) &&
+                                                    x.IsActive == true).ToListAsync();
+        }
+
+        public async Task UpdateProductAsync(Product product)
+        {
+            //prevent same name
+            if (db.Products.Any(x => x.ProductName.ToLower() == product.ProductName.ToLower())) return;
+
+            var prod = await db.Products.FindAsync(product.ProductId);
+            if (prod != null)
+            {
+                prod.ProductName = product.ProductName;
+                prod.Price = product.Price;
+                prod.Quantity = product.Quantity;
+                prod.ProductInventories = product.ProductInventories;
+
+                await db.SaveChangesAsync();
+            }
         }
     }
 }
