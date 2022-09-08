@@ -1,11 +1,12 @@
 ﻿@page "/addinventory"
 
+@attribute [Authorize]
+
 @inject IAddInventoryUseCase AddInventoryUseCase
 @inject NavigationManager NavigationManager
 
 <h3>Add Inventory</h3>
-<br />
-
+<br/>
 @if (inventory != null)
 {
     <EditForm Model="inventory" OnValidSubmit="OnValidSubmit">
@@ -16,10 +17,12 @@
             <label for="name">Inventory Name</label>
             <InputText id="name" @bind-Value="inventory.InventoryName" class="form-control"></InputText>
         </div>
+
         <div class="form-group">
             <label for="qty">Quantity</label>
             <InputNumber id="qty" @bind-Value="inventory.Quantity" class="form-control"></InputNumber>
         </div>
+
         <div class="form-group">
             <label for="price">Price</label>
             <InputNumber id="price" @bind-Value="inventory.Price" class="form-control"></InputNumber>
@@ -35,17 +38,16 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        inventory = new Inventory();
 
+        inventory = new Inventory();
     }
 
     private async Task OnValidSubmit()
     {
-        if(this.inventory != null)
+        if (this.inventory != null)
         {
             await AddInventoryUseCase.ExecuteAsync(this.inventory);
             NavigationManager.NavigateTo("/inventories");
         }
     }
-
 }

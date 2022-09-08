@@ -23,7 +23,7 @@
                          @productInventory.Inventory.InventoryName
                      </td>
                      <td>                         
-                        <input type="number" min="0" max="@productInventory.Inventory.Quantity"
+                        <input type="number" min="0" 
                             @bind-value="productInventory.InventoryQuantity"
                             @bind-value:event="oninput"
                             @onchange="OnInventoryQtyChanged"/>
