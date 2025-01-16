@@ -1,7 +1,7 @@
-# IMS (Inventory Managment System)
-IMS (Inventory Managment System) is a simple inventory management that contains just some minimal features. 
+# IMS (Inventory Management System)
+IMS (Inventory Management System) is a simple inventory management with minimal features. 
 
-The app uses the concept of ASP.NET Core Blazor in .NET 6 using Entity Framework Core, SQL Server, Clean Architecture and ASP.NET Core Identity for Authentication and Authorization.
+The app uses the concept of ASP.NET Core Blazor in .NET 6 using Entity Framework Core, SQL Server, Clean Architecture, and ASP.NET Core Identity for Authentication and Authorization.
 
 
 ## Run Locally
